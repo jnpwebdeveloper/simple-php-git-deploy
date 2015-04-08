@@ -231,13 +231,7 @@ if (!is_dir(LOCAL_REPOSITORY)) {
 	// LOCAL_REPOSITORY exists and hopefully already contains the correct remote origin
 	// so we'll fetch the changes and reset the contents.
 	$commands[] = sprintf(
-		'git --git-dir="%s" --work-tree="%s" fetch origin %s'
-		, LOCAL_REPOSITORY
-		, TARGET_DIR
-		, BRANCH
-	);
-	$commands[] = sprintf(
-		'git --git-dir="%s" --work-tree="%s" reset --hard FETCH_HEAD'
+		'git --git-dir="%s" --work-tree="%s" fetch origin +refs/heads/*:refs/heads/*'
 		, LOCAL_REPOSITORY
 		, TARGET_DIR
 	);
@@ -282,7 +276,7 @@ if (defined('USE_COMPOSER') && USE_COMPOSER === true) {
 // ==================================================[ Deployment ]===
 
 $commands[] = sprintf(
-	'git --git-dir="%s" --work-tree="%s" checkout %s'
+	'git --git-dir="%s" --work-tree="%s" -f checkout %s'
 	, LOCAL_REPOSITORY
 	, TARGET_DIR
 	, BRANCH
