@@ -243,11 +243,6 @@ if (!is_dir(LOCAL_REPOSITORY)) {
 	);
 }
 
-// Update the submodules
-$commands[] = sprintf(
-	'git submodule update --init --recursive'
-);
-
 // Describe the deployed version
 if (defined('VERSION_FILE') && VERSION_FILE !== '') {
 	$commands[] = sprintf(
