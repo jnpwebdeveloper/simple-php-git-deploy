@@ -279,22 +279,6 @@ if (defined('USE_COMPOSER') && USE_COMPOSER === true) {
 	}
 }
 
-// ==================================================[ Deployment ]===
-
-// Compile exclude parameters
-$exclude = '';
-foreach (unserialize(EXCLUDE) as $exc) {
-	$exclude .= ' --exclude='.$exc;
-}
-// Deployment command
-$commands[] = sprintf(
-	'rsync -rltgoDzvO %s %s %s %s'
-	, LOCAL_REPOSITORY
-	, TARGET_DIR
-	, (DELETE_FILES) ? '--delete-after' : ''
-	, $exclude
-);
-
 // =======================================[ Run the command steps ]===
 $output = '';
 foreach ($commands as $command) {
