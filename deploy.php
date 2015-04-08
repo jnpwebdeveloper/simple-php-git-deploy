@@ -231,9 +231,10 @@ if (!is_dir(LOCAL_REPOSITORY)) {
 	// LOCAL_REPOSITORY exists and hopefully already contains the correct remote origin
 	// so we'll fetch the changes and reset the contents.
 	$commands[] = sprintf(
-		'git --git-dir="%s" --work-tree="%s" fetch origin +refs/heads/*:refs/heads/*'
+		'git --git-dir="%s" --work-tree="%s" fetch origin %s:%s'
 		, LOCAL_REPOSITORY
 		, TARGET_DIR
+		, BRANCH
 	);
 }
 
