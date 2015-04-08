@@ -31,6 +31,13 @@ define('SECRET_ACCESS_TOKEN', 'BetterChangeMeNowOrSufferTheConsequences');
 define('REMOTE_REPOSITORY', 'https://github.com/markomarkovic/simple-php-git-deploy.git');
 
 /**
+ * The local path to the Repository to clone the repo to
+ *
+ * @var string Full path including the trailing slash
+ */
+define('LOCAL_REPOSITORY', '/mnt/repos/something.git/');
+
+/**
  * The branch that's being deployed.
  * Must be present in the remote repository.
  *
@@ -70,23 +77,6 @@ define('DELETE_FILES', false);
 define('EXCLUDE', serialize(array(
 	'.git',
 )));
-
-/**
- * Temporary directory we'll use to stage the code before the update. If it
- * already exists, script assumes that it contains an already cloned copy of the
- * repository with the correct remote origin and only fetches changes instead of
- * cloning the entire thing.
- *
- * @var string Full path including the trailing slash
- */
-define('TMP_DIR', '/tmp/spgd-'.md5(REMOTE_REPOSITORY).'/');
-
-/**
- * Whether to remove the TMP_DIR after the deployment.
- * It's useful NOT to clean up in order to only fetch changes on the next
- * deployment.
- */
-define('CLEAN_UP', true);
 
 /**
  * Output the version of the deployed code.

@@ -79,28 +79,18 @@ if (!defined('EXCLUDE')) define('EXCLUDE', serialize(array(
 )));
 
 /**
- * Temporary directory we'll use to stage the code before the update. If it
- * already exists, script assumes that it contains an already cloned copy of the
- * repository with the correct remote origin and only fetches changes instead of
- * cloning the entire thing.
+ * The local repository to setup
  *
  * @var string Full path including the trailing slash
  */
-if (!defined('TMP_DIR')) define('TMP_DIR', '/tmp/spgd-'.md5(REMOTE_REPOSITORY).'/');
-
-/**
- * Whether to remove the TMP_DIR after the deployment.
- * It's useful NOT to clean up in order to only fetch changes on the next
- * deployment.
- */
-if (!defined('CLEAN_UP')) define('CLEAN_UP', true);
+if (!defined('LOCAL_REPOSITORY')) define('LOCAL_REPOSITORY', '/mnt/repos/something.git/');
 
 /**
  * Output the version of the deployed code.
  *
  * @var string Full path to the file name
  */
-if (!defined('VERSION_FILE')) define('VERSION_FILE', TMP_DIR.'VERSION');
+if (!defined('VERSION_FILE')) define('VERSION_FILE', LOCAL_REPOSITORY.'VERSION');
 
 /**
  * Time limit for each command.
@@ -229,27 +219,27 @@ $commands = array();
 
 // ========================================[ Pre-Deployment steps ]===
 
-if (!is_dir(TMP_DIR)) {
-	// Clone the repository into the TMP_DIR
+if (!is_dir(LOCAL_REPOSITORY)) {
+	// Clone the repository into the LOCAL_REPOSITORY
 	$commands[] = sprintf(
 		'git clone --depth=1 --branch %s %s %s'
 		, BRANCH
 		, REMOTE_REPOSITORY
-		, TMP_DIR
+		, LOCAL_REPOSITORY
 	);
 } else {
-	// TMP_DIR exists and hopefully already contains the correct remote origin
+	// LOCAL_REPOSITORY exists and hopefully already contains the correct remote origin
 	// so we'll fetch the changes and reset the contents.
 	$commands[] = sprintf(
 		'git --git-dir="%s.git" --work-tree="%s" fetch origin %s'
-		, TMP_DIR
-		, TMP_DIR
+		, LOCAL_REPOSITORY
+		, LOCAL_REPOSITORY
 		, BRANCH
 	);
 	$commands[] = sprintf(
 		'git --git-dir="%s.git" --work-tree="%s" reset --hard FETCH_HEAD'
-		, TMP_DIR
-		, TMP_DIR
+		, LOCAL_REPOSITORY
+		, LOCAL_REPOSITORY
 	);
 }
 
@@ -262,8 +252,8 @@ $commands[] = sprintf(
 if (defined('VERSION_FILE') && VERSION_FILE !== '') {
 	$commands[] = sprintf(
 		'git --git-dir="%s.git" --work-tree="%s" describe --always > %s'
-		, TMP_DIR
-		, TMP_DIR
+		, LOCAL_REPOSITORY
+		, LOCAL_REPOSITORY
 		, VERSION_FILE
 	);
 }
@@ -286,7 +276,7 @@ if (defined('BACKUP_DIR') && BACKUP_DIR !== false) {
 if (defined('USE_COMPOSER') && USE_COMPOSER === true) {
 	$commands[] = sprintf(
 		'composer --no-ansi --no-interaction --no-progress --working-dir=%s install %s'
-		, TMP_DIR
+		, LOCAL_REPOSITORY
 		, (defined('COMPOSER_OPTIONS')) ? COMPOSER_OPTIONS : ''
 	);
 	if (defined('COMPOSER_HOME') && is_dir(COMPOSER_HOME)) {
@@ -304,28 +294,18 @@ foreach (unserialize(EXCLUDE) as $exc) {
 // Deployment command
 $commands[] = sprintf(
 	'rsync -rltgoDzvO %s %s %s %s'
-	, TMP_DIR
+	, LOCAL_REPOSITORY
 	, TARGET_DIR
 	, (DELETE_FILES) ? '--delete-after' : ''
 	, $exclude
 );
 
-// =======================================[ Post-Deployment steps ]===
-
-// Remove the TMP_DIR (depends on CLEAN_UP)
-if (CLEAN_UP) {
-	$commands['cleanup'] = sprintf(
-		'rm -rf %s'
-		, TMP_DIR
-	);
-}
-
 // =======================================[ Run the command steps ]===
 $output = '';
 foreach ($commands as $command) {
 	set_time_limit(TIME_LIMIT); // Reset the time limit for each command
-	if (file_exists(TMP_DIR) && is_dir(TMP_DIR)) {
-		chdir(TMP_DIR); // Ensure that we're in the right directory
+	if (file_exists(LOCAL_REPOSITORY) && is_dir(LOCAL_REPOSITORY)) {
+		chdir(LOCAL_REPOSITORY); // Ensure that we're in the right directory
 	}
 	$tmp = array();
 	exec($command.' 2>&1', $tmp, $return_code); // Execute the command
@@ -350,20 +330,6 @@ CHECK THE DATA IN YOUR TARGET DIR!
 </div>
 '
 		);
-		if (CLEAN_UP) {
-			$tmp = shell_exec($commands['cleanup']);
-			printf('
-
-
-Cleaning up temporary files ...
-
-<span class="prompt">$</span> <span class="command">%s</span>
-<div class="output">%s</div>
-'
-				, htmlentities(trim($commands['cleanup']))
-				, htmlentities(trim($tmp))
-			);
-		}
 		$error = sprintf(
 			'Deployment error on %s using %s!'
 			, $_SERVER['HTTP_HOST']
