@@ -86,13 +86,6 @@ if (!defined('EXCLUDE')) define('EXCLUDE', serialize(array(
 if (!defined('LOCAL_REPOSITORY')) define('LOCAL_REPOSITORY', '/mnt/repos/something.git/');
 
 /**
- * Output the version of the deployed code.
- *
- * @var string Full path to the file name
- */
-if (!defined('VERSION_FILE')) define('VERSION_FILE', LOCAL_REPOSITORY.'VERSION');
-
-/**
  * Time limit for each command.
  *
  * @var int Time in seconds
@@ -231,19 +224,8 @@ if (!is_dir(LOCAL_REPOSITORY)) {
 	// LOCAL_REPOSITORY exists and hopefully already contains the correct remote origin
 	// so we'll fetch the changes and reset the contents.
 	$commands[] = sprintf(
-		'git --git-dir="%s" --work-tree="%s" fetch --all'
+		'git --git-dir="%s" fetch origin +refs/heads/*:refs/heads/* --prune'
 		, LOCAL_REPOSITORY
-		, TARGET_DIR
-	);
-}
-
-// Describe the deployed version
-if (defined('VERSION_FILE') && VERSION_FILE !== '') {
-	$commands[] = sprintf(
-		'git --git-dir="%s" --work-tree="%s" describe --always > %s'
-		, LOCAL_REPOSITORY
-		, TARGET_DIR
-		, VERSION_FILE
 	);
 }
 
@@ -276,7 +258,7 @@ if (defined('USE_COMPOSER') && USE_COMPOSER === true) {
 // ==================================================[ Deployment ]===
 
 $commands[] = sprintf(
-	'git --git-dir="%s" --work-tree="%s" checkout %s'
+	'git --git-dir="%s" --work-tree="%s" checkout -f %s'
 	, LOCAL_REPOSITORY
 	, TARGET_DIR
 	, BRANCH

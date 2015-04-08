@@ -79,13 +79,6 @@ define('EXCLUDE', serialize(array(
 )));
 
 /**
- * Output the version of the deployed code.
- *
- * @var string Full path to the file name
- */
-define('VERSION_FILE', TMP_DIR.'VERSION');
-
-/**
  * Time limit for each command.
  *
  * @var int Time in seconds
