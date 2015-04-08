@@ -279,6 +279,15 @@ if (defined('USE_COMPOSER') && USE_COMPOSER === true) {
 	}
 }
 
+// ==================================================[ Deployment ]===
+
+$commands[] = sprintf(
+	'git --git-dir="%s" --work-tree="%s" checkout %s'
+	, LOCAL_REPOSITORY
+	, TARGET_DIR
+	, BRANCH
+);
+
 // =======================================[ Run the command steps ]===
 $output = '';
 foreach ($commands as $command) {
