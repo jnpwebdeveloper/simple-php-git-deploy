@@ -231,13 +231,13 @@ if (!is_dir(LOCAL_REPOSITORY)) {
 	// LOCAL_REPOSITORY exists and hopefully already contains the correct remote origin
 	// so we'll fetch the changes and reset the contents.
 	$commands[] = sprintf(
-		'git --git-dir="%s.git" --work-tree="%s" fetch origin %s'
+		'git --git-dir="%s" --work-tree="%s" fetch origin %s'
 		, LOCAL_REPOSITORY
 		, LOCAL_REPOSITORY
 		, BRANCH
 	);
 	$commands[] = sprintf(
-		'git --git-dir="%s.git" --work-tree="%s" reset --hard FETCH_HEAD'
+		'git --git-dir="%s" --work-tree="%s" reset --hard FETCH_HEAD'
 		, LOCAL_REPOSITORY
 		, LOCAL_REPOSITORY
 	);
@@ -251,7 +251,7 @@ $commands[] = sprintf(
 // Describe the deployed version
 if (defined('VERSION_FILE') && VERSION_FILE !== '') {
 	$commands[] = sprintf(
-		'git --git-dir="%s.git" --work-tree="%s" describe --always > %s'
+		'git --git-dir="%s" --work-tree="%s" describe --always > %s'
 		, LOCAL_REPOSITORY
 		, LOCAL_REPOSITORY
 		, VERSION_FILE
