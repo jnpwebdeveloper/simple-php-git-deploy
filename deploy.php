@@ -233,13 +233,13 @@ if (!is_dir(LOCAL_REPOSITORY)) {
 	$commands[] = sprintf(
 		'git --git-dir="%s" --work-tree="%s" fetch origin %s'
 		, LOCAL_REPOSITORY
-		, LOCAL_REPOSITORY
+		, TARGET_DIR
 		, BRANCH
 	);
 	$commands[] = sprintf(
 		'git --git-dir="%s" --work-tree="%s" reset --hard FETCH_HEAD'
 		, LOCAL_REPOSITORY
-		, LOCAL_REPOSITORY
+		, TARGET_DIR
 	);
 }
 
@@ -253,7 +253,7 @@ if (defined('VERSION_FILE') && VERSION_FILE !== '') {
 	$commands[] = sprintf(
 		'git --git-dir="%s" --work-tree="%s" describe --always > %s'
 		, LOCAL_REPOSITORY
-		, LOCAL_REPOSITORY
+		, TARGET_DIR
 		, VERSION_FILE
 	);
 }
